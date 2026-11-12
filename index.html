@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PitchSnitch – Notenlesen üben</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="app-header"><h1><span data-i18n="appTitle">PitchSnitch</span> <small data-i18n="appSubtitle">Notenlesen üben</small></h1></header>
+<p id="unsupported" class="banner-warning" role="alert" hidden></p>
+
+<main>
+  <!-- ======================= Config screen ======================= -->
+  <section id="config-screen" aria-labelledby="config-title">
+    <h2 id="config-title" data-i18n="config.title">Konfiguration</h2>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="language" data-i18n="field.language">Sprache</label>
+        <select id="language"></select>
+      </div>
+      <div class="field">
+        <label for="instrument" data-i18n="field.instrument">Instrument &amp; Notierung</label>
+        <select id="instrument" aria-describedby="instrument-hint"></select>
+        <p id="instrument-hint" class="hint"></p>
+      </div>
+    </div>
+
+    <fieldset id="registers-box" class="field" hidden>
+      <legend data-i18n="field.registers">Lagen</legend>
+      <div id="registers" class="checks"></div>
+    </fieldset>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="clef" data-i18n="field.clef">Schlüssel</label>
+        <select id="clef"></select>
+      </div>
+      <div class="field">
+        <label for="transposition" data-i18n="field.transposition">Transponierung</label>
+        <select id="transposition"></select>
+      </div>
+      <div class="field">
+        <label for="keySignature" data-i18n="field.keySignature">Tonart</label>
+        <select id="keySignature"></select>
+      </div>
+    </div>
+
+    <fieldset class="field">
+      <legend data-i18n="field.notes">Notenhöhen</legend>
+      <label class="check"><input type="checkbox" id="showRareSpellings"> <span data-i18n="field.showRareSpellings"></span></label>
+      <p id="rare-hint" class="filter-hint" role="status" data-i18n="filter.rareAuto" hidden></p>
+      <p id="filter-hint" class="filter-hint" role="status" hidden></p>
+      <div id="note-grid"></div>
+      <div id="note-preview" class="note-preview">
+        <h3 data-i18n="grid.preview">Gewählte Noten</h3>
+        <p id="note-preview-empty" data-i18n="grid.previewEmpty"></p>
+        <div id="note-preview-staff"></div>
+      </div>
+    </fieldset>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="concertA" data-i18n="field.concertA">Kammerton</label>
+        <select id="concertA"></select>
+      </div>
+    </div>
+
+    <fieldset class="field">
+      <legend data-i18n="field.durations">Notenwerte</legend>
+      <div id="durations" class="checks"></div>
+    </fieldset>
+
+    <div class="field">
+      <label class="check"><input type="checkbox" id="allowSyncopation" aria-describedby="sync-hint"> <span data-i18n="field.allowSyncopation">Synkopen erlauben</span></label>
+      <p id="sync-hint" class="hint" data-i18n="field.allowSyncopation.hint"></p>
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="timeSignature" data-i18n="field.timeSignature">Taktart</label>
+        <select id="timeSignature"></select>
+      </div>
+      <div class="field">
+        <label for="tempo" data-i18n="field.tempo">Tempo</label>
+        <select id="tempo"></select>
+      </div>
+      <div class="field">
+        <label for="bars" data-i18n="field.bars">Dauer in Takten</label>
+        <input id="bars" type="number" min="1" max="100" step="1" inputmode="numeric" aria-describedby="bars-error">
+        <p id="bars-error" class="field-error" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="countdown" data-i18n="field.countdown">Countdown</label>
+        <select id="countdown"></select>
+      </div>
+    </div>
+
+    <div id="issues-box" class="issues" role="status" hidden>
+      <p data-i18n="issues.title">Bitte noch ergänzen:</p>
+      <ul id="issues"></ul>
+    </div>
+    <button id="start" type="button" class="btn-primary" data-i18n="start">Test beginnen</button>
+
+    <section class="storage" aria-label="Speichern">
+      <div class="storage-buttons">
+        <button id="btn-save" type="button" data-i18n="storage.save">Speichern</button>
+        <button id="btn-load" type="button" data-i18n="storage.load">Laden</button>
+        <button id="btn-delete" type="button" data-i18n="storage.delete">Gespeicherte Konfiguration löschen</button>
+      </div>
+      <p class="notice" data-i18n="storage.notice"></p>
+      <p id="storage-status" class="status" aria-live="polite"></p>
+    </section>
+  </section>
+
+  <!-- ======================= Test screen ======================= -->
+  <section id="test-screen" hidden>
+    <div class="toolbar">
+      <button id="btn-abort" type="button" class="btn-primary" data-i18n="test.abort">Test abbrechen</button>
+      <button id="btn-repeat" type="button" class="btn-primary" data-i18n="test.repeat" hidden>Gleiche Noten wiederholen</button>
+      <button id="btn-new" type="button" data-i18n="test.new" hidden>Neue Noten</button>
+      <button id="btn-to-config" type="button" data-i18n="test.toConfig" hidden>Zur Konfiguration</button>
+      <span id="test-status" class="status" aria-live="polite"></span>
+    </div>
+    <p id="test-note" class="hint" data-i18n="test.audioPrivacy"></p>
+    <div id="score-viewport" class="score-viewport">
+      <div id="score-sheet" class="score-sheet"></div>
+      <p id="rotate-hint" class="rotate-hint" data-i18n="test.rotate" hidden></p>
+      <div id="score-overlay" class="score-overlay" hidden aria-live="polite"><span class="big"></span><span class="small"></span></div>
+    </div>
+  </section>
+</main>
+
+<footer id="footer" class="app-footer">
+  <a href="impressum.html" data-href-en="impressum-en.html" data-i18n="footer.imprint">Impressum</a>
+  <a href="datenschutz.html" data-href-en="datenschutz-en.html" data-i18n="footer.privacy">Datenschutz</a>
+  <a href="lizenzen.html" data-href-en="lizenzen-en.html" data-i18n="footer.licenses">Lizenzen</a>
+</footer>
+
+<script src="vendor/vexflow/vexflow-bravura.js"></script>
+<script type="module" src="js/ui/app.js"></script>
+</body>
+</html>
